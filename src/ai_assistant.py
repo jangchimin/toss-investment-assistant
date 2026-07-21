@@ -97,6 +97,11 @@ PENDING
 22. 도구가 실패했다면 성공한 것처럼 답하지 않는다.
 
 23. 한국어로 자연스럽고 이해하기 쉽게 답한다.
+
+24. 포트폴리오 비중이나 집중도 분석 요청에는
+    analyze_current_portfolio 도구를 사용한다.
+
+25. 서로 다른 통화의 금액은 환율 정보 없이 합산하지 않는다.
 """.strip()
 
 
@@ -139,6 +144,22 @@ TOOLS = [
                 },
             },
             "required": ["symbol"],
+            "additionalProperties": False,
+        },
+        "strict": True,
+    },
+    {
+        "type": "function",
+        "name": "analyze_current_portfolio",
+        "description": (
+            "현재 보유 종목의 통화별 수익, 종목 비중, 집중도, "
+            "상위 보유 종목과 데이터 누락 여부를 분석한다. "
+            "포트폴리오 구성, 쏠림 또는 분산 상태를 묻는 경우 사용한다."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": [],
             "additionalProperties": False,
         },
         "strict": True,
@@ -747,6 +768,9 @@ def execute_tool(
         return request_fastapi(
             f"/holdings/{encoded_symbol}"
         )
+
+    if tool_name == "analyze_current_portfolio":
+        return request_fastapi("/portfolio/analysis")
 
     if tool_name == "check_server_health":
         return request_fastapi("/health")

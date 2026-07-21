@@ -2,6 +2,7 @@ from typing import Any
 
 from api import get_accounts, get_holdings
 from auth import get_access_token
+from portfolio import PortfolioAnalyzer
 
 
 def to_float(value: Any) -> float | None:
@@ -23,7 +24,9 @@ def get_first_account_seq(access_token: str) -> int:
     accounts = accounts_data.get("result", [])
 
     if not accounts:
-        raise RuntimeError("조회 가능한 토스증권 계좌가 없습니다.")
+        raise RuntimeError(
+            "조회 가능한 토스증권 계좌가 없습니다."
+        )
 
     account_seq = accounts[0].get("accountSeq")
 
@@ -46,7 +49,9 @@ def get_portfolio() -> dict:
             "토스증권 액세스 토큰 발급에 실패했습니다."
         )
 
-    account_seq = get_first_account_seq(access_token)
+    account_seq = get_first_account_seq(
+        access_token
+    )
 
     holdings_data = get_holdings(
         access_token,
@@ -175,3 +180,14 @@ def get_holding(symbol: str) -> dict | None:
             return holding
 
     return None
+
+
+def get_portfolio_analysis() -> dict:
+    """현재 보유 종목의 비중과 손익을 분석한다."""
+
+    portfolio = get_portfolio()
+    holdings = portfolio.get("holdings", [])
+
+    analyzer = PortfolioAnalyzer()
+
+    return analyzer.analyze(holdings)

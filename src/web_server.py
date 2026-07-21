@@ -1,15 +1,19 @@
 from fastapi import FastAPI, HTTPException
 
-from service import get_holding, get_portfolio
+from service import (
+    get_holding,
+    get_portfolio,
+    get_portfolio_analysis,
+)
 
 
 app = FastAPI(
     title="Toss Investment Assistant API",
     description=(
-        "토스증권 계좌와 보유 종목을 조회하는 "
-        "읽기 전용 REST API"
+        "토스증권 계좌와 보유 종목을 조회하고 "
+        "포트폴리오를 분석하는 REST API"
     ),
-    version="0.1.0",
+    version="0.2.0",
 )
 
 
@@ -40,6 +44,19 @@ def read_portfolio() -> dict:
     try:
         return get_portfolio()
     except RuntimeError as error:
+        raise HTTPException(
+            status_code=500,
+            detail=str(error),
+        ) from error
+
+
+@app.get("/portfolio/analysis")
+def read_portfolio_analysis() -> dict:
+    """보유 종목의 비중과 손익을 분석한다."""
+
+    try:
+        return get_portfolio_analysis()
+    except (RuntimeError, ValueError) as error:
         raise HTTPException(
             status_code=500,
             detail=str(error),

@@ -25,6 +25,7 @@ def test_empty_holdings_returns_empty_result():
     assert result == {
         "summary_by_currency": {},
         "positions": [],
+        "concentration_by_currency": {},
     }
 
 
